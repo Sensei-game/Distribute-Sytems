@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30517.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistSysAcw", "DistSysAcw\DistSysAcw.csproj", "{EDCFC4D3-ECE3-4BED-9734-BC35144D5227}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistSysAcwClient", "DistSysAcwClient\DistSysAcwClient.csproj", "{276D5CFF-019E-4FE1-A6CE-BD6135C9259F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EDCFC4D3-ECE3-4BED-9734-BC35144D5227}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDCFC4D3-ECE3-4BED-9734-BC35144D5227}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDCFC4D3-ECE3-4BED-9734-BC35144D5227}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDCFC4D3-ECE3-4BED-9734-BC35144D5227}.Release|Any CPU.Build.0 = Release|Any CPU
+		{276D5CFF-019E-4FE1-A6CE-BD6135C9259F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{276D5CFF-019E-4FE1-A6CE-BD6135C9259F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{276D5CFF-019E-4FE1-A6CE-BD6135C9259F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{276D5CFF-019E-4FE1-A6CE-BD6135C9259F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EE788710-464E-4C23-BB69-6314C35891D9}
+	EndGlobalSection
+EndGlobal
