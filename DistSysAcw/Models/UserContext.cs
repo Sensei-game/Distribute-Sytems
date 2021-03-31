@@ -4,10 +4,7 @@ namespace DistSysAcw.Models
 {
     public class UserContext : DbContext
     {
-        public UserContext() : base()
-        {
-
-        }
+        public UserContext() : base() {}
 
         public DbSet<User> Users { get; set; }
 
@@ -16,6 +13,7 @@ namespace DistSysAcw.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=DistSysAcw;");
+            base.OnConfiguring(optionsBuilder);
         }
     }
 }

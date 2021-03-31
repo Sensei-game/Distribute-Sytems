@@ -54,6 +54,7 @@ namespace DistSysAcw.Controllers
 
             Array.Sort(integers);
 
+
             foreach(var num in integers)
             {
                 if (num != integers.Last<int>())
