@@ -5,6 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using DistSysAcw.Controllers;
+using Microsoft.Data.SqlClient;
 
 namespace DistSysAcw.Models
 {
@@ -31,18 +34,19 @@ namespace DistSysAcw.Models
     //Make an intsnace in the controller and then call all the bellow methods
     public static class UserDatabaseAccess
     {
-        private static UserContext ctx = new UserContext();
+        //private static UserContext ctx = new UserContext();
 
         //GET Request User/New?username=blahblah
         public static string CheckUser(string username)
         {
-            using (ctx)
+            //Need to refresh context or else it gets removed at the end of the using bracket
+            using (var ctx = new UserContext())
             {
                 if (ctx.Users.Where(x => x.UserName == username).FirstOrDefault() == null)
                 {
                     return "False - User Does Not Exist! Did you mean to do a POST to create a new user?";
                 }
-                else if(username == "")
+                else if(username == null)
                 {
                     return "True - User Does Exist! Did you mean to do a POST to create a new user?";
                 }
@@ -52,34 +56,49 @@ namespace DistSysAcw.Models
                 }
             }
         }
+        public static Guid GuidKey;
 
         //POST Request User/New
-        public static string CreateUser(string newuser)
+        public static void CreateUser(string newuser)
         {
-            Guid GuidKey = Guid.NewGuid();
-
-            using (ctx)
+            GuidKey = Guid.NewGuid();
+            //Need to refresh context or else it gets removed at the end of the using bracket
+            using (var ctx = new UserContext())
             {
                 //change this with bits in the body
 
-                if (newuser is string)
+                if (newuser is string == true)
                 {
                     if (ctx.Users.Where(x => x.UserName == newuser).FirstOrDefault() == null)
                     {
-                        User usrn = new User { ApiKey = GuidKey.ToString(), UserName = newuser, Role = "Admin" };
-                        ctx.Users.Add(usrn);
-                        ctx.SaveChanges();
-                        return GuidKey.ToString();
+                        if (ctx.Users.FirstOrDefault() == null) //SELECT TOP 1000 [ApiKey] ,[UserName] ,[Role] FROM [dbo].[Users]
+                        {
+                            User usrn = new User { ApiKey = GuidKey.ToString(), UserName = newuser, Role = "Admin" };
+                            ctx.Users.Add(usrn);
+                            ctx.SaveChanges();
+                        }
+                        else
+                        {
+                            User usrn = new User { ApiKey = GuidKey.ToString(), UserName = newuser, Role = "User" };
+                            ctx.Users.Add(usrn);
+                            ctx.SaveChanges();
+                        }
+                        
+                        UserController.output = 1;
+                        
                     }
                     else
                     {
-                        throw new HttpException("Oops. This username is already in use. Please try again with a new username.", 403);
+                        //throw new HttpResponseException("Oops. This username is already in use. Please try again with a new username.", HttpStatusCode.Forbidden);
+                        UserController.output = 2;
                     }
 
                 }
-                else
-                {
-                    throw new HttpException("Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json", 400);
+                else if(newuser is string == false)
+                {//need to work on this
+
+                    //throw new HttpResponseException("Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json", HttpStatusCode.BadRequest);
+                    UserController.output = 3;
                 }
             }
         }

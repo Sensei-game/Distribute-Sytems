@@ -46,11 +46,11 @@ namespace DistSysAcw.Controllers
 
         [ActionName("Sort")]
         [HttpGet]
-        public string sort([FromQuery]int[] integers)
+        public IActionResult sort([FromQuery]int[] integers)
         {
             #region TASK1
 
-            string message = "";
+            string message = null;
 
             Array.Sort(integers);
 
@@ -74,7 +74,7 @@ namespace DistSysAcw.Controllers
             //   send the integers back as the api/talkback/sort response
             //   conform to the error handling requirements in the spec
 
-                return "[" + message + "]"; 
+                return Ok("[" + message + "]"); 
 
            
 

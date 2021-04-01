@@ -1,4 +1,5 @@
 ﻿using DistSysAcw.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,8 @@ namespace DistSysAcw.Controllers
     [ApiController]
     public class UserController : BaseController
     {
+        public static int output = 0;
+
         public UserController(Models.UserContext dbcontext) : base(dbcontext)
         {
 
@@ -26,9 +29,7 @@ namespace DistSysAcw.Controllers
         [HttpGet]
         public string Check([FromQuery] string username)
         {
-
             return UserDatabaseAccess.CheckUser(username);
-                 
         }
 
 
@@ -36,9 +37,22 @@ namespace DistSysAcw.Controllers
         //Body adds items for User, either one element or more
         [ActionName("New")]
         [HttpPost]
-        public string insert([FromBody] string newuser )
+        public IActionResult Insert([FromBody] string newuser )
         {
-            return UserDatabaseAccess.CreateUser(newuser);
+             UserDatabaseAccess.CreateUser(newuser);
+          
+            if(output == 1) 
+            {
+                return Ok(UserDatabaseAccess.GuidKey.ToString());
+            }
+            else if (output == 2)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, "Oops. This username is already in use. Please try again with a new username.");//403 code;
+            }
+            else
+            { 
+                return BadRequest("Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json");
+            }
         }
 
 
