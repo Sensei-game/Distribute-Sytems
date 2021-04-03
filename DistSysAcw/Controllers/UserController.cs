@@ -1,4 +1,7 @@
-﻿using DistSysAcw.Models;
+﻿using DistSysAcw.Auth;
+using DistSysAcw.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -25,11 +28,11 @@ namespace DistSysAcw.Controllers
 
 
         //GET request User/New?username=blahblah
-        [ActionName ("New")]
+        [ActionName("New")]
         [HttpGet]
-        public string Check([FromQuery] string username)
+        public IActionResult Check([FromQuery] string username)
         {
-            return UserDatabaseAccess.CheckUser(username);
+            return Ok(UserDatabaseAccess.CheckUser(username));
         }
 
 
@@ -37,11 +40,11 @@ namespace DistSysAcw.Controllers
         //Body adds items for User, either one element or more
         [ActionName("New")]
         [HttpPost]
-        public IActionResult Insert([FromBody] string newuser )
+        public IActionResult Insert([FromBody] string newuser)
         {
-             UserDatabaseAccess.CreateUser(newuser);
-          
-            if(output == 1) 
+            UserDatabaseAccess.CreateUser(newuser);
+
+            if (output == 1)
             {
                 return Ok(UserDatabaseAccess.GuidKey.ToString());
             }
@@ -50,13 +53,27 @@ namespace DistSysAcw.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, "Oops. This username is already in use. Please try again with a new username.");//403 code;
             }
             else
-            { 
+            {
                 return BadRequest("Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json");
             }
         }
 
-
-
+        [ActionName("RemoveUser")]
+        [HttpDelete]
+        [Authorize(Roles = "Admin, User")]
+        public IActionResult Delete([FromQuery] string username, [FromHeader] string ApiKey)
+        {
+            if (UserDatabaseAccess.CheckApiKey(ApiKey) != null)
+            {
+                var key = UserDatabaseAccess.CheckApiKey(ApiKey);
+                if( key.UserName == username)
+                {
+                    UserDatabaseAccess.DeleteUser(key);
+                    return Ok(true);
+                }
+            }
+            return Ok(false);
+        }
 
     }
 }

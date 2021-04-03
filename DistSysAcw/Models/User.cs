@@ -48,7 +48,7 @@ namespace DistSysAcw.Models
                 }
                 else if(username == null)
                 {
-                    return "True - User Does Exist! Did you mean to do a POST to create a new user?";
+                    return "False - User Does Not Exist! Did you mean to do a POST to create a new user?";
                 }
                 else
                 {
@@ -56,6 +56,34 @@ namespace DistSysAcw.Models
                 }
             }
         }
+
+        //TASK 7 Remove User
+        public static void DeleteUser(User Deleuser)
+        {
+            using (var ctx = new UserContext())
+            {
+                ctx.Remove(Deleuser);
+                ctx.SaveChanges();
+            }
+        }
+
+        public static User CheckApiKey(string apiKey)
+        {
+            //Need to refresh context or else it gets removed at the end of the using bracket
+            using (var ctx = new UserContext())
+            {
+                if (ctx.Users.Where(x => x.ApiKey == apiKey).FirstOrDefault() != null)
+                {
+                    return ctx.Users.Find(ctx.Users.Where(x => x.ApiKey == apiKey));
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+
         public static Guid GuidKey;
 
         //POST Request User/New
