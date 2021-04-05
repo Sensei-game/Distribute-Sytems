@@ -15,7 +15,7 @@ namespace DistSysAcw.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "Admin, User")]
+
     public class UserController : BaseController
     {
         public static int output = 0;
@@ -63,8 +63,8 @@ namespace DistSysAcw.Controllers
         ///api/user/removeuser?username=<username>
         [ActionName("RemoveUser")]
         [HttpDelete]
-        
-        public IActionResult Delete([FromQuery] string username, [FromHeader(Name = "x-api-key")] string ApiKey)
+        [Authorize(Roles = "Admin, User")]
+        public IActionResult Delete([FromQuery] string username, [FromHeader(Name = "ApiKey")] string ApiKey)
         {
             if (UserDatabaseAccess.CheckApiKey(ApiKey) != null)
             {
@@ -73,6 +73,10 @@ namespace DistSysAcw.Controllers
                 {
                     UserDatabaseAccess.DeleteUser(key);
                     return Ok(true);
+                }
+                else
+                {
+                    return Ok(false); 
                 }
             }
             return Ok(false);

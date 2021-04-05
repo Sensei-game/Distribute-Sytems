@@ -31,7 +31,7 @@ namespace DistSysAcw.Auth
             // (e.g. [Authorize(Roles = "Admin")]) and the user does not have the Admin role, you return a Forbidden status (403) 
             // with the message: "Forbidden. Admin access only."
             #endregion
-            
+
 
             if (context.User != null && context.User.Identity.IsAuthenticated)
             {
@@ -42,25 +42,30 @@ namespace DistSysAcw.Auth
                         context.Succeed(requirement);
                         return Task.CompletedTask;
                     }
+                    //else
+                    //{
+                        
+                    //    HttpContextAccessor.HttpContext.Response.StatusCode = 403;
+                    //    byte[] messagebytes = Encoding.ASCII.GetBytes("Forbidden. Admin access only.");
 
+                    //    HttpContextAccessor.HttpContext.Response.ContentType = "application/json";
+                    //    HttpContextAccessor.HttpContext.Response.Body.WriteAsync(messagebytes, 0, messagebytes.Length);
+
+                    //    context.Fail();
+                    //    return Task.CompletedTask;
+                    //}
                 }
             }
-
             //return false with "Forbidden. Admin access only."
-            
+            HttpContextAccessor.HttpContext.Response.StatusCode = 403;
+            byte[] messagebytes = Encoding.ASCII.GetBytes("Forbidden. Admin access only.");
 
-            HttpContextAccessor.HttpContext.Response.OnStarting(async () =>
-            {
-                HttpContextAccessor.HttpContext.Response.StatusCode = 403;
-                byte[] messagebytes = Encoding.ASCII.GetBytes("Forbidden. Admin access only.");
-
-                HttpContextAccessor.HttpContext.Response.ContentType = "application/json";
-                await HttpContextAccessor.HttpContext.Response.Body.WriteAsync(messagebytes, 0, messagebytes.Length);
-            });
-
+            HttpContextAccessor.HttpContext.Response.ContentType = "application/json";
+            HttpContextAccessor.HttpContext.Response.Body.WriteAsync(messagebytes, 0, messagebytes.Length);
             context.Fail();
 
             return Task.CompletedTask;
+
         }
         
 

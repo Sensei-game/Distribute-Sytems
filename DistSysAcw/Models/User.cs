@@ -76,8 +76,11 @@ namespace DistSysAcw.Models
                 {
                     return ctx.Users.Find(apiKey);
                 }
+                else
+                {
+                    return null;
+                }
             }
-            return null;
         }
 
 

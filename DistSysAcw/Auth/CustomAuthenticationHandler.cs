@@ -40,14 +40,17 @@ namespace DistSysAcw.Auth
         {
             var re = Request;
             var headers = re.Headers;
+            var query = re.Query;
 
-            if (headers.ContainsKey("x-api-key") == true)
+            if (headers.ContainsKey("ApiKey") == true)
             {
-                headers.TryGetValue("x-api-key", out var dbApiKey);
+                headers.TryGetValue("ApiKey", out var dbApiKey);
+
+                //query.TryGetValue("username", out var username);
 
                 //Use the User Acces class to get the User of that API
 
-                if(UserDatabaseAccess.CheckApiKey(dbApiKey) != null)
+                if(UserDatabaseAccess.CheckApiKey(dbApiKey) != null /*&& UserDatabaseAccess.CheckUser(username) != "False - User Does Not Exist! Did you mean to do a POST to create a new user?"*/)
                 {
                     User foundUser = UserDatabaseAccess.CheckApiKey(dbApiKey);
                     Claim[] claims = { new Claim(ClaimTypes.Name, foundUser.UserName), new Claim(ClaimTypes.Role, foundUser.Role) };
@@ -60,6 +63,7 @@ namespace DistSysAcw.Auth
                 
             }
             //Continue with 401 error             
+
             return Task.FromResult(AuthenticateResult.Fail("Unauthorized. Check ApiKey in Header is correct."));
 
 
