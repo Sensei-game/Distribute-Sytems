@@ -47,7 +47,7 @@ namespace DistSysAcw.Auth
             }
 
             //return false with "Forbidden. Admin access only."
-            context.Fail();
+            
 
             HttpContextAccessor.HttpContext.Response.OnStarting(async () =>
             {
@@ -57,6 +57,8 @@ namespace DistSysAcw.Auth
                 HttpContextAccessor.HttpContext.Response.ContentType = "application/json";
                 await HttpContextAccessor.HttpContext.Response.Body.WriteAsync(messagebytes, 0, messagebytes.Length);
             });
+
+            context.Fail();
 
             return Task.CompletedTask;
         }

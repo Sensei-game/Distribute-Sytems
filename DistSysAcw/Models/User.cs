@@ -74,13 +74,10 @@ namespace DistSysAcw.Models
             {
                 if (ctx.Users.Where(x => x.ApiKey == apiKey).FirstOrDefault() != null)
                 {
-                    return ctx.Users.Find(ctx.Users.Where(x => x.ApiKey == apiKey));
-                }
-                else
-                {
-                    return null;
+                    return ctx.Users.Find(apiKey);
                 }
             }
+            return null;
         }
 
 

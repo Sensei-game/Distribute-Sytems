@@ -36,14 +36,14 @@ namespace DistSysAcw.Auth
 
         //[Authorize(Roles = "Admin, User")]
         //Authorize future requests which will need to use ApiKeys
-        protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             var re = Request;
             var headers = re.Headers;
 
-            if (headers.ContainsKey("ApiKey") == true)
+            if (headers.ContainsKey("x-api-key") == true)
             {
-                headers.TryGetValue("ApiKey", out var dbApiKey);
+                headers.TryGetValue("x-api-key", out var dbApiKey);
 
                 //Use the User Acces class to get the User of that API
 
@@ -55,13 +55,12 @@ namespace DistSysAcw.Auth
                     var principal = new ClaimsPrincipal(identity);
 
                     AuthenticationTicket ticket = new AuthenticationTicket(principal, this.Scheme.Name);
-                    return await Task.FromResult(AuthenticateResult.Success(ticket));
+                    return Task.FromResult(AuthenticateResult.Success(ticket));
                 }
                 
             }
             //Continue with 401 error             
-            await UserNotFoundAPI();
-            return await Task.FromResult(AuthenticateResult.Fail("Unauthorized. Check ApiKey in Header is correct."));
+            return Task.FromResult(AuthenticateResult.Fail("Unauthorized. Check ApiKey in Header is correct."));
 
 
             #region Task5
@@ -71,18 +70,9 @@ namespace DistSysAcw.Auth
             #endregion
         }
 
-        private async Task UserNotFoundAPI()
-        {
-            byte[] messagebytes = Encoding.ASCII.GetBytes("Unauthorized. Check ApiKey in Header is correct.");
-            Context.Response.StatusCode = 401;
-            Context.Response.ContentType = "application/json";
-            await Context.Response.Body.WriteAsync(messagebytes, 0, messagebytes.Length);
-        }
-
-
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            byte[] messagebytes = Encoding.ASCII.GetBytes("Task 5 Incomplete");
+            byte[] messagebytes = Encoding.ASCII.GetBytes("Unauthorized. Check ApiKey in Header is correct.");
             Context.Response.StatusCode = 401;
             Context.Response.ContentType = "application/json";
             await Context.Response.Body.WriteAsync(messagebytes, 0, messagebytes.Length);
