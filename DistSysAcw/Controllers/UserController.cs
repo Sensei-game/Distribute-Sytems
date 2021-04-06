@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,6 +20,8 @@ namespace DistSysAcw.Controllers
     public class UserController : BaseController
     {
         public static int output = 0;
+      
+        
 
         public UserController(Models.UserContext dbcontext) : base(dbcontext)
         {
@@ -82,5 +85,44 @@ namespace DistSysAcw.Controllers
             return Ok(false);
         }
 
+
+
+
+        [ActionName("ChangeRole")]
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public IActionResult ChangeRole([FromHeader(Name = "ApiKey")] string ApiKey, [FromBody] ObjectJ bod)
+        {
+            try
+            {
+                if (bod.role == "Admin" || bod.role == "User")
+                {
+                    if (UserDatabaseAccess.CheckApiKey(ApiKey) != null && UserDatabaseAccess.CheckUser(bod.username) != "False - User Does Not Exist! Did you mean to do a POST to create a new user?")
+                    {
+                        var user = UserDatabaseAccess.CheckApiKey(ApiKey);
+                        UserDatabaseAccess.ChangeRole(user, bod.role);
+                        return Ok("DONE");
+                    }
+                    else
+                    {
+                        return BadRequest("NOT DONE: Username does not exist");
+                    }
+                }
+                else
+                {
+                    return BadRequest("NOT DONE: Role does not exist");
+                }
+            }
+            catch
+            {
+                return BadRequest("NOT DONE: An error occured");
+            }
+        }
+    }
+
+    public class ObjectJ
+    {
+        public string username { get; set; }
+        public string role { get; set; }
     }
 }

@@ -67,6 +67,16 @@ namespace DistSysAcw.Models
             }
         }
 
+        public static void ChangeRole(User changed_user, string role)
+        {
+            using(var ctx = new UserContext())
+            {
+                ctx.Users.Update(changed_user);
+                changed_user.Role = role;
+                ctx.SaveChanges();
+            }
+        }
+
         public static User CheckApiKey(string apiKey)
         {
             //Need to refresh context or else it gets removed at the end of the using bracket
