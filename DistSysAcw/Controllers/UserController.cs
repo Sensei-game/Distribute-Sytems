@@ -36,6 +36,7 @@ namespace DistSysAcw.Controllers
         [HttpGet]
         public IActionResult Check([FromQuery] string username)
         {
+            //Console.WriteLine(UserDatabaseAccess.CheckUser(username));
             return Ok(UserDatabaseAccess.CheckUser(username));
         }
 
@@ -50,14 +51,17 @@ namespace DistSysAcw.Controllers
 
             if (output == 1)
             {
+                //Console.WriteLine("Got API Key");
                 return Ok(UserDatabaseAccess.GuidKey.ToString());
             }
             else if (output == 2)
             {
+                //Console.WriteLine("Oops. This username is already in use. Please try again with a new username.");
                 return StatusCode(StatusCodes.Status403Forbidden, "Oops. This username is already in use. Please try again with a new username.");//403 code;
             }
             else
             {
+                //Console.WriteLine("Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json");
                 return BadRequest("Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json");
             }
         }
@@ -118,6 +122,8 @@ namespace DistSysAcw.Controllers
                 return BadRequest("NOT DONE: An error occured");
             }
         }
+
+
     }
 
     public class ObjectJ

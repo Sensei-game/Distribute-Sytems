@@ -32,6 +32,7 @@ namespace DistSysAcw.Controllers
         {
             #region TASK1
             // TODO: add api/talkback/hello response
+            //Console.WriteLine("Hello World");
             return "Hello World";
             #endregion
         }
@@ -73,10 +74,10 @@ namespace DistSysAcw.Controllers
             //   sort the integers into ascending order
             //   send the integers back as the api/talkback/sort response
             //   conform to the error handling requirements in the spec
+           // Console.WriteLine("[" + message + "]");
+            return Ok("[" + message + "]");
 
-                return Ok("[" + message + "]"); 
 
-           
 
             #endregion
         }
