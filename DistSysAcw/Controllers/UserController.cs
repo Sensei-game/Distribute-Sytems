@@ -97,11 +97,11 @@ namespace DistSysAcw.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult ChangeRole([FromHeader(Name = "ApiKey")] string ApiKey, [FromBody] ObjectJ bod)
         {
-            try
+            if (UserDatabaseAccess.CheckApiKey(ApiKey) != null)
             {
                 if (bod.role == "Admin" || bod.role == "User")
                 {
-                    if (UserDatabaseAccess.CheckApiKey(ApiKey) != null && UserDatabaseAccess.CheckUser(bod.username) != "False - User Does Not Exist! Did you mean to do a POST to create a new user?")
+                    if (UserDatabaseAccess.CheckUser(bod.username) != "False - User Does Not Exist! Did you mean to do a POST to create a new user?")
                     {
                         var user = UserDatabaseAccess.CheckApiKey(ApiKey);
                         UserDatabaseAccess.ChangeRole(user, bod.role);
@@ -116,14 +116,10 @@ namespace DistSysAcw.Controllers
                 {
                     return BadRequest("NOT DONE: Role does not exist");
                 }
+
             }
-            catch
-            {
-                return BadRequest("NOT DONE: An error occured");
-            }
+            return BadRequest("NOT DONE: An error occured");
         }
-
-
     }
 
     public class ObjectJ
