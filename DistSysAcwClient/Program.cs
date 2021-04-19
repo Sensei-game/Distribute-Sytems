@@ -98,6 +98,42 @@ namespace DistSysAcwClient
                         }
 
                     }
+                    else if (command.Contains("PublicKey"))
+                    {
+                        if (currentApiKey == "")
+                        {
+                            Console.WriteLine("You need to do a User Post or User Set first");
+                        }
+                        else
+                        {
+                            path = "api/protected/getpublickey";
+
+                            try
+                            {
+                                HttpResponseMessage response = await client.GetAsync(path);
+
+                                string final_Response = await response.Content.ReadAsStringAsync();
+
+                                if (response.StatusCode == HttpStatusCode.OK)
+                                {
+                                    string RSApublicKey = final_Response.TrimStart('"').TrimEnd('"');
+
+                                    RSAclient.FromXmlString(RSApublicKey);
+
+                                    Console.WriteLine("Got Public Key");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Couldn’t Get the Public Key");
+                                }
+
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e.GetBaseException().Message);
+                            }
+                        }
+                    }
                     else if (command.Contains("Get"))
                     {
                         string username = command.Split(" ")[2];
@@ -288,42 +324,7 @@ namespace DistSysAcwClient
                         }
                         
                     }
-                    else if (command.Contains("PublicKey"))
-                    {
-                        if (currentApiKey == "")
-                        {
-                            Console.WriteLine("You need to do a User Post or User Set first");
-                        }
-                        else
-                        {
-                            path = "api/protected/getpublickey";
-
-                            try
-                            {
-                                HttpResponseMessage response = await client.GetAsync(path);
-
-                                string final_Response = await response.Content.ReadAsStringAsync();
-
-                                if (response.StatusCode == HttpStatusCode.OK)
-                                {
-                                    string RSApublicKey = final_Response.TrimStart('"').TrimEnd('"');
-
-                                    RSAclient.FromXmlString(RSApublicKey);
-
-                                    Console.WriteLine("Got Public Key");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Couldn’t Get the Public Key");
-                                }
-
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.GetBaseException().Message);
-                            }
-                        }
-                    }
+                    
                     else if(command.Contains("Sign"))
                     {
                         if (currentApiKey == "")
@@ -342,9 +343,15 @@ namespace DistSysAcwClient
 
                             HttpResponseMessage response = await client.GetAsync(path);
 
+                            byte[] bytesToVerify = Encoding.UTF8.GetBytes(message);
                             var Hash = await response.Content.ReadAsByteArrayAsync();
+                            //  RSAclient.FromXmlString()
 
-                            bool signed = RSAclient.VerifyData(Encoding.Default.GetBytes(message), "SHA1", Hash);
+                           // SHA1Managed Hashman = new SHA1Managed();
+
+                            //byte[] hashedData = Hashman.ComputeHash(Hash);
+
+                            bool signed = RSAclient.VerifyData(bytesToVerify, "SHA1", Hash);
 
                             if (signed == true)
                             {
