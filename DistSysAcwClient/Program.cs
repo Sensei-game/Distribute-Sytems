@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -343,15 +344,32 @@ namespace DistSysAcwClient
 
                             HttpResponseMessage response = await client.GetAsync(path);
 
-                            byte[] bytesToVerify = Encoding.UTF8.GetBytes(message);
-                            var Hash = await response.Content.ReadAsByteArrayAsync();
-                            //  RSAclient.FromXmlString()
+                            
+                            var Hash_string = await response.Content.ReadAsStringAsync();
 
-                           // SHA1Managed Hashman = new SHA1Managed();
+                            //Trim
+                            Hash_string = Hash_string.TrimStart('"').TrimEnd('"');
+                            Hash_string = Hash_string.Replace("-", "");
 
-                            //byte[] hashedData = Hashman.ComputeHash(Hash);
+                            int length = Hash_string.Length >> 1;
+                            byte[] signature = new byte[length];
 
-                            bool signed = RSAclient.VerifyData(bytesToVerify, "SHA1", Hash);
+                            for (int i = 0; i < length; i++)
+                            {
+                                signature[i] = Byte.Parse(Hash_string.Substring(i * 2, 2), NumberStyles.HexNumber);
+                            }
+
+
+                            
+
+                            //String is a hex string 
+
+                            //Sign the message
+
+                           byte[] bytes = Encoding.UTF8.GetBytes(message);
+
+
+                            bool signed = RSAclient.VerifyData(bytes, CryptoConfig.MapNameToOID("SHA1"), signature);
 
                             if (signed == true)
                             {
