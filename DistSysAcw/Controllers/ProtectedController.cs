@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -161,40 +162,64 @@ namespace DistSysAcw.Controllers
         {
             if(UserDatabaseAccess.CheckApiKey(ApiKey) != null)
             {
-                string response ="";
 
-                byte[] bytes = Encoding.UTF8.GetBytes(encryptedInteger);
-                string limits = BitConverter.ToString(bytes).Replace("-", "");
-                byte[] limits_bytes = Encoding.UTF8.GetBytes(limits);
-                var decryptedInteger = RSAserver.Decrypt(limits_bytes, true);
+                byte[] encrypted;
+                //HEXADECIMAL and encrypt 
+
+                //Intgere
+
+                encryptedInteger = encryptedInteger.TrimStart('"').TrimEnd('"');
+                encryptedInteger = encryptedInteger.Replace("-", "");
+               
+                int length = encryptedInteger.Length >> 1;
+                byte[] buyt = new byte[length];
+
+                for (int i = 0; i < length; i++)
+                {
+                    buyt[i] = Byte.Parse(encryptedInteger.Substring(i * 2, 2), NumberStyles.HexNumber);
+                }
+
+                var decryptedInteger = RSAserver.Decrypt(buyt, false);
                 var textInt = BitConverter.ToInt32(decryptedInteger);
 
                 textInt += 50;
                 
+                // Turn back to hexadecimal later
 
+                //Symmetric key
+                encryptedSymKey = encryptedSymKey.TrimStart('"').TrimEnd('"');
+                encryptedSymKey = encryptedSymKey.Replace("-", "");
 
+                int length_Key = encryptedSymKey.Length >> 1;
+                byte[] buyt_key = new byte[length_Key];
 
-                byte[] bytes1 = Encoding.UTF8.GetBytes(encryptedSymKey);
-                string limits1 = BitConverter.ToString(bytes1).Replace("-", "");
-                byte[] limits_bytes1 = Encoding.UTF8.GetBytes(limits1);
-                var decryptedInteger1 = RSAserver.Decrypt(limits_bytes1, true);
-               // string textInt1 = BitConverter.ToString(decryptedInteger1);
+                for (int i = 0; i < length_Key; i++)
+                {
+                    buyt_key[i] = Byte.Parse(encryptedSymKey.Substring(i * 2, 2), NumberStyles.HexNumber);
+                }
+            
+                var decrypted_SYm = RSAserver.Decrypt(buyt_key, false);
+              
 
+                //IV
+                encryptedIV = encryptedIV.TrimStart('"').TrimEnd('"');
+                encryptedIV = encryptedIV.Replace("-", "");
 
+                int length1 = encryptedIV.Length >> 1;
+                byte[] buyt_IV = new byte[length1];
+            
+                for (int i = 0; i < length1; i++)
+                {
+                    buyt_IV[i] = Byte.Parse(encryptedIV.Substring(i * 2, 2), NumberStyles.HexNumber);
+                }
 
+                var decryptedIV = RSAserver.Decrypt(buyt_IV, false);
 
-                byte[] bytes2 = Encoding.UTF8.GetBytes(encryptedIV);
-                string limits2 = BitConverter.ToString(bytes2).Replace("-", "");
-                byte[] limits_bytes2 = Encoding.UTF8.GetBytes(limits2);
-                var decryptedInteger2 = RSAserver.Decrypt(limits_bytes2, true);
-                // string textInt2 = BitConverter.ToString(decryptedInteger2);
-
-                byte[] encrypted;
-
+                //ENCRYPTION WITH AES
                 using (AesManaged aesAlg = new AesManaged())
                 {
-                    aesAlg.Key = decryptedInteger1;
-                    aesAlg.IV = decryptedInteger2;
+                    aesAlg.Key = decrypted_SYm;
+                    aesAlg.IV = decryptedIV;
 
                     ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
 
@@ -211,11 +236,7 @@ namespace DistSysAcw.Controllers
                         }
                     }
                 }
-                foreach (byte b in encrypted)
-                {
-                    //Use X2 for Upper case, x2 for lowercase
-                    response += b.ToString("X2");
-                }
+                string response = BitConverter.ToString(encrypted);
                 return Ok(response);
 
             }
